@@ -1,0 +1,156 @@
+﻿QUESTIONS
+
+
+1. What is the command to invoke the slack-request function (4 pts)?
+a.Via Curl: 
+Ans)curl http://localhost:8080/function/slack-request
+
+
+b.Via faas-cli:
+Ans) echo surya | faas-cli invoke slack-request
+
+
+2. What is the output you see when you invoke the slack-request function?
+{
+  "text": "Serverless Message",
+  "attachments": [
+    {
+      "fields": [
+        {
+          "short": true,
+          "value": "100",
+          "title": "Amazing Level"
+        }
+      ],
+      "author_icon": "https://imgur.com/a/NL7nTRF",
+      "image_url": "https://imgur.com/a/NL7nTRF",
+      "author_name": "Surya",
+      "title": "The Awesome world of Cloud Computing! COEN 241"
+    },
+    {
+      "text": "COEN 241 is the most awesome class ever!.",
+      "title": "About COEN 241"
+    },
+    {
+      "title": "Would you recommend COEN 241 to your friends?",
+      "color": "#3AA3E3",
+      "actions": [
+        {
+          "text": "Of Course!",
+          "type": "button",
+          "name": "recommend",
+          "value": "recommend"
+        },
+        {
+          "text": "Most Definitely!",
+          "type": "button",
+          "name": "definitely",
+          "value": "definitely"
+        }
+      ],
+      "callback_id": "response123",
+      "fallback": "Would you recommend COEN 241 to your friends?",
+      "attachment_type": "default"
+    }
+  ]
+}
+
+
+3. What is the command to invoke the slack-interactive function? (4 pts)
+a.Via curl 
+Ans) In VM: curl http://localhost:8080/function/slack-interactive --data ‘{“user”:”surya”}’
+
+
+b.Via faas-cli :
+Ans) echo ‘{“course”:”COEN241”}’ | faas-cli invoke slack-interactive
+
+
+4. What is the output you see when you invoke the slack-interactive function?
+{
+  "attachments": [
+    {
+      "footer": "Slack Apps built on OpenFaas",
+      "author_link": "http://github.com/skiranu/COEN241-HW2",
+      "color": "#36a64f",
+      "text": "Head over to COEN 241",
+      "title": "COEN 241",
+      "ts": 123456789,
+      "author_name": "Surya",
+      "title_link": "https://www.scu.edu/engineering/academic-programs/department-of-computer-engineering/graduate/course-descriptions/",
+      "image_url": "https://www.scu.edu/media/offices/umc/scu-brand-guidelines/visual-identity-amp-photography/visual-identity-toolkit/logos-amp-seals/Mission-Dont3.png",
+      "response_type": "ephemeral",
+      "replace_original": true,
+      "footer_icon": "https://a.slack-edge.com/45901/marketing/img/_rebrand/meta/slack_hash_256.png",
+      "pretext": "Ahh yeah! Great choice, COEN 241 is absolutely amazing!",
+      "fallback": "Required plain-text summary of the attachment.",
+      "thumb_url": "https://www.scu.edu/engineering/academic-programs/department-of-computer-engineering/graduate/course-descriptions/",
+      "author_icon": "https://imgur.com/a/NL7nTRF"
+    }
+  ]
+}
+
+
+5. How would you pass different arguments to the functions?
+Ans):
+1.  	echo surya | curl -X POST --data @- http://localhost:8080/function/slack-request
+	echo ‘{“surya”:”kiran”}’ | curl -X POST --data @- http://localhost:8080/function/slack-interactive
+
+
+
+2. 	curl  http://localhost:8080/function/slack-request -d ‘
+        >echo surya
+        curl  http://localhost:8080/function/slack-interactive -d ‘
+        >99
+
+
+
+
+3. 	Curl  http://localhost:8080/function/slack-request -d ‘COEN’
+	Curl  http://localhost:8080/function/slack-interactive -d 99
+
+
+6. How would you change the slack-interactive function to react to different inputs? (4 pts)
+Ans) Since we are getting the input string in the handle function. We can check the value of input if its
+A string/number or a combination of string and number and decide the output based on the input:
+
+
+#Importing required libraries 
+import json
+import urllib
+
+
+#Function to handle the request
+def handle(req):
+        #Checking the input string if it is COEN
+        If str(req) == “COEN”:
+                Msg = “please enter another value”        
+                #Return the msg when input is COEN.
+                Return json.dumps(msg)
+        else:
+        #Setting the page encoding as UTF-8 and getting the req
+        urlstring = urllib.unquote(req).decode('utf8').strip('payload=')
+        #Loading the URL
+        response = json.loads(urlstring)
+        data = {
+            "attachments": [
+                {
+                    "replace_original": True,
+                    "response_type": "ephemeral",
+                    "fallback": "Required plain-text summary of the attachment.",
+                    "color": "#36a64f",
+                    "pretext": "Ahh yeah! Great choice, COEN 241 is absolutely amazing!",
+                    "author_name": "Surya",
+                    "author_link": "http://github.com/skiranu/COEN241-HW2",
+                    "author_icon": "https://imgur.com/a/NL7nTRF",
+                    "title": "COEN 241",
+                    "title_link": "https://www.scu.edu/engineering/academic-programs/department-of-computer-engineering/graduate/course-descriptions/",
+                    "text": "Head over to COEN 241",
+                    "image_url": "https://www.scu.edu/media/offices/umc/scu-brand-guidelines/visual-identity-amp-photography/visual-identity-toolkit/logos-amp-seals/Mission-Dont3.png",
+                    "thumb_url": "https://www.scu.edu/engineering/academic-programs/department-of-computer-engineering/graduate/course-descriptions/",
+                    "footer": "Slack Apps built on OpenFaas",
+                    "footer_icon": "https://a.slack-edge.com/45901/marketing/img/_rebrand/meta/slack_hash_256.png",
+                    "ts": 123456789
+                }
+            ]
+        }
+        return json.dumps(data)
