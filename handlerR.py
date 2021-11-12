@@ -11,7 +11,7 @@ def handle(req):
                 "short": True
             }],
             "author_name": "Surya",
-            "author_icon": "https://imgur.com/a/NL7nTRF",
+            "author_icon": "",
             "image_url": "https://imgur.com/a/NL7nTRF"
         },
         {
