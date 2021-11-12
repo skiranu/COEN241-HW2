@@ -1,0 +1,7 @@
+﻿Requirement:
+1. faasd version: 0.14.3 (orchestration: containerd)
+2. Docker Client: Version: 20.10.7
+3. Docker Server: Engine:  Version: 20.10.7
+4. Python 3.8.10
+5. ngrok for hosting public address.
+6. Slack application with incoming webhooks and slash command
